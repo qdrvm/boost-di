@@ -11,8 +11,8 @@ set(CXX_STANDARD 14 CACHE STRING "C++ Standard Version. [14|17|20]")
 add_library(${PROJECT_NAME} INTERFACE)
 target_include_directories(
         ${PROJECT_NAME} INTERFACE
-        ${CMAKE_CURRENT_SOURCE_DIR}/include
-        ${CMAKE_CURRENT_SOURCE_DIR}/extension/include
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/extension/include>
 )
 
 if(${CMAKE_CXX_COMPILER_ID} STREQUAL GNU)
@@ -58,3 +58,35 @@ option(BOOST_DI_OPT_BUILD_EXAMPLES "Build perform Boost.DI examples" ${IS_TOPLEV
 if (BOOST_DI_OPT_BUILD_EXAMPLES)
     add_subdirectory(example)
 endif ()
+
+include(GNUInstallDirs)
+
+function(install_target targets config)
+    install(TARGETS ${targets} EXPORT ${config}
+        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+        INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+        PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+        FRAMEWORK DESTINATION ${CMAKE_INSTALL_PREFIX}
+        )
+endfunction()
+
+set(CONFIG_NAME "${PROJECT_NAME}Config")
+install_target(${PROJECT_NAME} ${CONFIG_NAME})
+
+install(
+    DIRECTORY ${CMAKE_SOURCE_DIR}/include/
+    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+)
+install(
+    DIRECTORY ${CMAKE_SOURCE_DIR}/extension/include/
+    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+)
+
+set(CONFIG_DESTINATION_DIR "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}")
+install(
+    EXPORT ${CONFIG_NAME}
+    NAMESPACE di::
+    DESTINATION ${CONFIG_DESTINATION_DIR}
+)
