@@ -5,6 +5,7 @@
 # (See accompanying file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 #
 cmake_minimum_required(VERSION 2.8)
+cmake_policy(SET CMP0048 NEW)
 project(Boost.DI VERSION 1.1.0 LANGUAGES CXX)
 set(CXX_STANDARD 14 CACHE STRING "C++ Standard Version. [14|17|20]")
 
