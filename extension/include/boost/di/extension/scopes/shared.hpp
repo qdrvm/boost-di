@@ -60,13 +60,12 @@ class shared {
      */
     template <class, class, class TProvider>
     wrappers::shared<shared, T> create(const TProvider& provider) && {
+#if !defined(BOOST_DI_NOT_THREAD_SAFE)
+      std::lock_guard<std::mutex> lock(mutex_);
+#endif
       auto& object = provider.cfg().template data<T>();
       if (!object) {
-#if !defined(BOOST_DI_NOT_THREAD_SAFE)
-        std::lock_guard<std::mutex> lock(mutex_);
-        if (!object)
-#endif
-          object = std::shared_ptr<T>{provider.get()};
+        object = std::shared_ptr<T>{provider.get()};
       }
       return wrappers::shared<shared, T>{std::static_pointer_cast<T>(object)};
     }
